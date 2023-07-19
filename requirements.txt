@@ -1,5 +1,7 @@
 python-telegram-bot
-schedule
+schedule~=1.2.0
 
-telegram
+telegram~=0.0.1
 pip~=23.2
+
+python-dateutil~=2.8.2

@@ -1,8 +1,9 @@
 from telegram import Update
 from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from bot.tasks import add_task_command, complete_task_command, delete_task_command, show_tasks_command, \
-    edit_task_command
-from bot.callback_handlers import handle_complete_query, handle_delete_query, handle_edit_task_query, \
+    edit_task_command, set_timer_command
+from bot.callback_handlers import handle_complete_query, handle_delete_query, handle_set_timer_query, \
+    handle_edit_task_query, \
     handle_edit_task_input_or_messages
 from bot.logger import log_info, log_error
 
@@ -22,12 +23,17 @@ def register_handlers(app):
     app.add_handler(CommandHandler("deletetask", delete_task_command))
     app.add_handler(CallbackQueryHandler(handle_delete_query, pattern=r"^delete_task_"))
 
+    # Register the command and callback query handlers for setting reminders
+    app.add_handler(CommandHandler("setreminder", set_timer_command))
+    app.add_handler(CallbackQueryHandler(handle_set_timer_query, pattern=r"^setreminder_"))
+
     # Add the handlers to the dispatcher
-    app.add_handler(CommandHandler("edittask", edit_task_command))
+    app.add_handler(CommandHandler("edittext", edit_task_command))
     app.add_handler(CallbackQueryHandler(handle_edit_task_query, pattern=r"^edit_task_"))
 
     # Register the combined MessageHandler for handling edit task input and other text messages
     app.add_handler(MessageHandler(filters.TEXT, handle_edit_task_input_or_messages))
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:

@@ -20,11 +20,19 @@ cursor.execute('''
         description TEXT,
         status INTEGER,
         create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        complete_date TIMESTAMP
+        complete_date TIMESTAMP,
+        reminder_time TIMESTAMP,
+        reminder_status INTEGER DEFAULT 0
     )
 ''')
 
 conn.commit()
+
+
+def get_user_tasks(user_id):
+    cursor.execute('SELECT id, text, status FROM tasks WHERE user_id = ?', (user_id,))
+    task_rows = cursor.fetchall()
+    return task_rows
 
 
 # def dummy():
@@ -98,6 +106,7 @@ conn.commit()
 #     print("Dummy tasks added successfully!")
 #
 
+
 async def add_task_command(update, context):
     try:
         user_id = update.effective_user.id
@@ -154,8 +163,7 @@ async def complete_task_command(update: Update, context: CallbackContext):
     try:
         user_id = update.effective_user.id
 
-        cursor.execute('SELECT id, text FROM tasks WHERE user_id = ? AND status = 0', (user_id,))
-        task_rows = cursor.fetchall()
+        task_rows = get_user_tasks(user_id)
 
         if task_rows:
             keyboard = []
@@ -216,8 +224,7 @@ async def show_tasks_command(update: Update, context):
     try:
         user_id = update.effective_user.id
 
-        cursor.execute('SELECT id, text, status FROM tasks WHERE user_id = ?', (user_id,))
-        task_rows = cursor.fetchall()
+        task_rows = get_user_tasks(user_id)
 
         if task_rows:
             keyboard = []
@@ -244,47 +251,12 @@ async def show_tasks_command(update: Update, context):
                                        text='An error occurred while showing tasks. Please try again.')
 
 
-# async def edit_task(update: Update, context: CallbackContext):
-#     try:
-#         user_id = update.effective_user.id
-#
-#         cursor.execute('SELECT id, text, description FROM tasks WHERE user_id = ?', (user_id,))
-#         task_rows = cursor.fetchall()
-#
-#         if task_rows:
-#             keyboard = []
-#             for task in task_rows:
-#                 task_id = task[0]
-#                 task_text = task[1]
-#                 task_description = task[2]
-#
-#                 button_text = f'{task_text} - {task_description}'
-#                 button = InlineKeyboardButton(button_text, callback_data=f"edit_task_{task_id}")
-#                 keyboard.append([button])
-#
-#             reply_markup = InlineKeyboardMarkup(keyboard)
-#
-#             await context.bot.send_message(chat_id=update.effective_chat.id, text='Select a task to edit:',
-#                                            reply_markup=reply_markup)
-#             log_info("Tasks displayed.")
-#         else:
-#             await context.bot.send_message(chat_id=update.effective_chat.id, text='No tasks found!')
-#             log_info("No tasks found.")
-#
-#     except Exception as e:
-#         log_error("An error occurred while showing tasks: {}".format(str(e)))
-#         await context.bot.send_message(chat_id=update.effective_chat.id,
-#                                        text='An error occurred while showing tasks. Please try again.')
-
-
-# Handler for /edittask command
 async def edit_task_command(update: Update, context: CallbackContext):
     try:
         user_id = update.effective_user.id
 
         # Fetch the tasks for the user
-        cursor.execute('SELECT id, text, description FROM tasks WHERE user_id = ?', (user_id,))
-        task_rows = cursor.fetchall()
+        task_rows = get_user_tasks(user_id)
 
         if task_rows:
             keyboard = []
@@ -311,3 +283,33 @@ async def edit_task_command(update: Update, context: CallbackContext):
         await context.bot.send_message(chat_id=update.effective_chat.id,
                                        text='An error occurred while showing tasks. Please try again.')
 
+
+async def set_timer_command(update: Update, context: CallbackContext):
+    try:
+        # Display all the tasks to the user and let them choose which task to set a reminder for
+        user_id = update.effective_user.id
+        task_rows = get_user_tasks(user_id)
+
+        if task_rows:
+            keyboard = []
+            for task in task_rows:
+                task_id = task[0]
+                task_text = task[1]
+
+                button_text = f'{task_text}'
+                keyboard.append([InlineKeyboardButton(button_text, callback_data=f"setreminder_{task_id}")])
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await context.bot.send_message(chat_id=update.effective_chat.id,
+                                           text='Select a task to set a reminder for:', reply_markup=reply_markup)
+            log_info("Tasks displayed.")
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id,
+                                           text="You have no tasks to set reminders for.")
+            log_info("No tasks found.")
+
+    except Exception as e:
+        log_error("An error occurred while showing tasks: {}".format(str(e)))
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text='An error occurred while showing tasks. Please try again.')

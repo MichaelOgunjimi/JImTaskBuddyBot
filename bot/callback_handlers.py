@@ -4,6 +4,32 @@ from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes, 
 from config import BOT_USERNAME
 from bot.response import get_response
 import re
+from bot.scheduler import schedule_task_timer
+
+
+def extract_text_and_description(input_string):
+    # Check if both text and description are present
+    if "description:" in input_string:
+        # Extract text using regex
+        text_match = re.search(r'^(.*?)\sdescription:', input_string)
+        if text_match:
+            text = text_match.group(1).strip()
+        else:
+            text = None
+
+        # Extract description using regex
+        description_match = re.search(r'description:\s(.*)$', input_string)
+        if description_match:
+            description = description_match.group(1).strip()
+        else:
+            description = None
+
+    else:
+        # Only text is provided
+        text = input_string.strip()
+        description = None
+
+    return text, description
 
 
 async def handle_edit_task_input_or_messages(update: Update, context: CallbackContext):
@@ -13,6 +39,10 @@ async def handle_edit_task_input_or_messages(update: Update, context: CallbackCo
             print("Editing task input in progress")
             # Editing task input is in progress, handle it
             await handle_edit_task_input(update, context)
+        elif 'set_timer_task_id' in context.user_data:
+            print("Setting timer input in progress")
+            # Setting timer input is in progress, handle it
+            return handle_timer_input(update, context)
         else:
             print("No editing task input in progress")
             # No editing task input in progress, handle other text messages
@@ -22,7 +52,6 @@ async def handle_edit_task_input_or_messages(update: Update, context: CallbackCo
         print(f"An error occurred in handle_edit_task_input_or_messages: {str(e)}")
         log_error("An error occurred in handle_edit_task_input_or_messages: {}".format(str(e)))
         await update.message.reply_text('An error occurred. Please try again.')
-
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -165,27 +194,42 @@ async def handle_edit_task_input(update: Update, context: CallbackContext):
         await update.message.reply_text('An error occurred while handling the edit task input. Please try again.')
 
 
+async def handle_set_timer_query(update: Update, context: CallbackContext):
+    query = update.callback_query
+    try:
+        task_id = query.data.replace("setreminder_", "")
 
-def extract_text_and_description(input_string):
-    # Check if both text and description are present
-    if "description:" in input_string:
-        # Extract text using regex
-        text_match = re.search(r'^(.*?)\sdescription:', input_string)
-        if text_match:
-            text = text_match.group(1).strip()
+        # Ask the user for the time input using a message
+        context.user_data['set_timer_task_id'] = task_id
+        await query.message.reply_text("Please enter the time for the reminder using natural language (e.g., 2 hours, 4 days):")
+
+        # Set the next state to handle_timer_input
+        context.set_next_state("handle_timer_input")
+
+    except Exception as e:
+        log_error("An error occurred while handling the set_timer callback: {}".format(str(e)))
+        await query.message.reply_text('An error occurred while handling the set_timer callback. Please try again.')
+
+
+async def handle_timer_input(update: Update, context: CallbackContext):
+    try:
+        time_input = update.message.text
+        task_id = context.user_data['set_timer_task_id']
+        success = schedule_task_timer(task_id, time_input)
+
+        if success:
+            await update.message.reply_text(f"Reminder set successfully for the task with ID {task_id}.")
         else:
-            text = None
+            await update.message.reply_text("Failed to set the reminder. Please try again.")
 
-        # Extract description using regex
-        description_match = re.search(r'description:\s(.*)$', input_string)
-        if description_match:
-            description = description_match.group(1).strip()
-        else:
-            description = None
+        # Clear the user_data to mark the end of the timer input
+        context.user_data.pop('set_timer_task_id')
 
-    else:
-        # Only text is provided
-        text = input_string.strip()
-        description = None
+        # Return to handling other messages
+        await handle_messages(update, context)
 
-    return text, description
+    except Exception as e:
+        log_error("An error occurred while handling the timer input: {}".format(str(e)))
+        await update.message.reply_text('An error occurred while handling the timer input. Please try again.')
+        # Clear the user_data to mark the end of the timer input
+        context.user_data.pop('set_timer_task_id')

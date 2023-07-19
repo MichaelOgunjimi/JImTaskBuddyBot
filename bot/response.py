@@ -1,6 +1,7 @@
 import re
 from bot.response_list import response_list
 
+
 def process_message(message, response_array, response):
     # Splits the message and the punctuation into an array
     list_message = re.findall(r"[\w']+|[.,!?;]", message.lower())
