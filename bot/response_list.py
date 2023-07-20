@@ -19,7 +19,8 @@ response_list = [
     [['show', 'tasks'], ['To see your tasks, use the /showtasks command.']],
     [['delete', 'task'], ['To delete a task, use the /deletetask command.']],
     [['edit', 'task', 'my'], ['To edit a task, use the /edittask command.']],
-    [['task', 'reminder'], ['To set a task reminder, use the /setreminder command.']],
+    [['task', 'can', 'you', 'reminder', 'set', 'reminder', 'setreminder'], ['To set a task reminder, use the /setreminder '
+                                                               'command.']],
     [['task', 'details'], ['To get details about a task, use the /taskdetails command.']],
     [['completed', 'tasks'], ['To view completed tasks, use the /completedtasks command.']],
     [['incomplete', 'tasks'], ['To view completed tasks, use the /incompletedtasks command.']],

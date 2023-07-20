@@ -42,12 +42,12 @@ def get_response(message):
     return bot_response
 
 # Test your system
-# get_response('What is your name?')
-# get_response('Can you help me with something please?')
-# get_response('Add a new task for me.')
-# get_response('How can I complete a task?')
-# get_response('Show me my tasks.')
-# get_response('Can I edit a task?')
-# get_response('Delete a task from my list.')
-# get_response('Can you remind me about a task?')
-# get_response('Tell me the details of a task.')
+# get_response('What is your name?') # Output: My name is MyTaskBuddy, nice to meet you!
+# get_response('Can you help me with something please?') # Output: I will do my best to assist you!
+# get_response('Add a new task for me.') # Output: You can use the /addtask command to add a task.
+# get_response('How can I complete a task?') # Output: To complete a task, use the /completetask command.
+# get_response('Show me my tasks.') # Output: To see your tasks, use the /showtasks command.
+# get_response('Can I edit a task?') # Output: To edit a task, use the /edittask command.
+# get_response('Delete a task from my list.') # Output: To delete a task, use the /deletetask command.
+# get_response('Can you remind me about a task?') # Output: To set a task reminder, use the /setreminder command.
+# get_response('Tell me the details of a task.') # Output: To get details about a task, use the /taskdetails command.
