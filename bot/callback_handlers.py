@@ -1,10 +1,10 @@
 from bot.tasks import cursor, conn, log_error, log_info
 from telegram import Update
-from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler, CallbackContext
+from telegram.ext import ContextTypes, CallbackContext
 from config import BOT_USERNAME
 from bot.response import get_response
+from bot.tasks import get_task_by_id
 import re
-from bot.scheduler import schedule_task_timer
 
 
 def extract_text_and_description(input_string):
@@ -33,24 +33,20 @@ def extract_text_and_description(input_string):
 
 
 async def handle_edit_task_input_or_messages(update: Update, context: CallbackContext):
-    print("Handling edit task input or messages...")  # Add this print statement
     try:
         if 'edit_task_id' in context.user_data:
-            print("Editing task input in progress")
+            print("User editing task input in progress")
             # Editing task input is in progress, handle it
             await handle_edit_task_input(update, context)
-        elif 'set_timer_task_id' in context.user_data:
-            print("Setting timer input in progress")
-            # Setting timer input is in progress, handle it
-            return handle_timer_input(update, context)
         else:
-            print("No editing task input in progress")
+            print("User normal input in progress")
             # No editing task input in progress, handle other text messages
-            await handle_messages(update, context)
+            bot_response = await handle_messages(update, context)
+            user_id = update.message.chat.id
+            log_info(f"User ({user_id}) - Bot Response: {bot_response}")
 
     except Exception as e:
-        print(f"An error occurred in handle_edit_task_input_or_messages: {str(e)}")
-        log_error("An error occurred in handle_edit_task_input_or_messages: {}".format(str(e)))
+        log_error(f"An error occurred in handle_edit_task_input_or_messages: {str(e)}")
         await update.message.reply_text('An error occurred. Please try again.')
 
 
@@ -58,7 +54,6 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message_type = update.message.chat.type
         text = update.message.text
-
         user_id = update.message.chat.id
 
         log_info(f"User ({user_id}) in {message_type}: {text}")
@@ -72,11 +67,13 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             response = get_response(text)
 
-        log_info("Bot: " + response)
+        log_info(f"Bot: {response}")
         await update.message.reply_text(response)
 
+        return response  # Return the bot response for use in handle_edit_task_input_or_messages
+
     except Exception as e:
-        log_error("An error occurred while handling messages: {}".format(str(e)))
+        log_error(f"An error occurred while handling messages: {str(e)}")
         await update.message.reply_text('An error occurred while handling messages. Please try again.')
 
 
@@ -194,42 +191,22 @@ async def handle_edit_task_input(update: Update, context: CallbackContext):
         await update.message.reply_text('An error occurred while handling the edit task input. Please try again.')
 
 
-async def handle_set_timer_query(update: Update, context: CallbackContext):
+async def handle_task_details_command(update: Update, context: CallbackContext):
     query = update.callback_query
     try:
-        task_id = query.data.replace("setreminder_", "")
+        task_id = query.data.replace("task_", "")
 
-        # Ask the user for the time input using a message
-        context.user_data['set_timer_task_id'] = task_id
-        await query.message.reply_text("Please enter the time for the reminder using natural language (e.g., 2 hours, 4 days):")
+        # Get the task details from the database using the task_id
+        task_details = get_task_by_id(task_id)  # Implement this function to fetch details from the database
 
-        # Set the next state to handle_timer_input
-        context.set_next_state("handle_timer_input")
+        # Format the details and send them to the user
+        details_message = f"Task ID: {task_details['id']}\nTask Text: {task_details['text']}\n"
+        details_message += f"Description: {task_details['description']}\nStatus: {'Completed' if task_details['status'] == 1 else 'Incomplete'}\n"
+        details_message += f"Create Date: {task_details['create_date']}\nComplete Date: {task_details['complete_date']}\n"
+        details_message += f"Reminder Time: {task_details['reminder_time']}\nReminder Status: {'Set' if task_details['reminder_status'] == 1 else 'Not Set'}"
 
-    except Exception as e:
-        log_error("An error occurred while handling the set_timer callback: {}".format(str(e)))
-        await query.message.reply_text('An error occurred while handling the set_timer callback. Please try again.')
-
-
-async def handle_timer_input(update: Update, context: CallbackContext):
-    try:
-        time_input = update.message.text
-        task_id = context.user_data['set_timer_task_id']
-        success = schedule_task_timer(task_id, time_input)
-
-        if success:
-            await update.message.reply_text(f"Reminder set successfully for the task with ID {task_id}.")
-        else:
-            await update.message.reply_text("Failed to set the reminder. Please try again.")
-
-        # Clear the user_data to mark the end of the timer input
-        context.user_data.pop('set_timer_task_id')
-
-        # Return to handling other messages
-        await handle_messages(update, context)
+        await query.message.reply_text(details_message)
 
     except Exception as e:
-        log_error("An error occurred while handling the timer input: {}".format(str(e)))
-        await update.message.reply_text('An error occurred while handling the timer input. Please try again.')
-        # Clear the user_data to mark the end of the timer input
-        context.user_data.pop('set_timer_task_id')
+        log_error("An error occurred while handling the task details: {}".format(str(e)))
+        await query.message.reply_text('An error occurred while handling the task details. Please try again.')

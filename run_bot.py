@@ -1,7 +1,6 @@
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application
 import config
-from bot.task_bot import register_handlers, start, error
-from bot.scheduler import run_scheduler
+from bot.task_bot import register_handlers
 
 
 def main():
@@ -10,13 +9,9 @@ def main():
     # Register command handlers
     register_handlers(app)
 
-    # Error
-    app.add_error_handler(error)
+    # Run the bot
     print("Starting Bot...")
     app.run_polling(poll_interval=3)
-
-    # run_scheduler()
-
 
 
 if __name__ == '__main__':
