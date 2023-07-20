@@ -106,7 +106,7 @@ python index.py
 
 ## Usage Video
 
-<video src="images/dummyvideo.mp4"></video>
+![JimTaskBuddy](/images/dummyvideo.mp4)
 
 With JimTaskBuddy as your daily task assistant, you can stay organized, focused, and productive throughout your day. Try
 it out and simplify your task management today!
