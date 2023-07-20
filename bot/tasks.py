@@ -328,7 +328,7 @@ async def show_tasks_command(update: Update, context):
             keyboard = []
             for task in task_rows:
                 task_id = task[0]
-                task_text = task[1]
+                task_text = task[2]
                 task_status = "completed" if task[2] == 1 else "incomplete"
                 button_text = f"{task_text} - {task_status}"
                 button = InlineKeyboardButton(button_text, callback_data="dummy_value")

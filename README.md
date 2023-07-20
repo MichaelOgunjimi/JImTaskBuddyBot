@@ -1,5 +1,5 @@
-
 # JimTaskBuddy - Your Daily Task Assistant
+
 <p align="center" style="border-radius: 20px;">
   <img src="images/JimTaskBuddyLogo.jpg" alt="JimTaskBuddy Logo" width="200" height="200">
 </p>
@@ -66,23 +66,25 @@ JimTaskBuddy is a Telegram bot created through the Telegram API, dedicated to im
 
 ### Table View
 
-| Command         | Description                                                           |
-|-----------------|-----------------------------------------------------------------------|
-| /addtask        | Add a new task to your list with an optional description.             |
-| /completetask   | Mark a task as completed to stay organized.                           |
-| /showtasks      | View all your tasks in one place.                                     |
-| /completedtasks | See a list of your completed tasks.                                   |
-| /incompletetasks| Check your pending tasks that need completion.                        |
-| /edittask       | Modify the text of an existing task for better clarity.               |
-| /deletetask     | Remove a task from your list when it's no longer needed.              |
-| /setreminder    | Set a reminder for a task to stay on top of your schedule.             |
-| /taskdetails    | Get detailed information about a specific task.                        |
+| Command          | Description                                                |
+|------------------|------------------------------------------------------------|
+| /addtask         | Add a new task to your list with an optional description.  |
+| /completetask    | Mark a task as completed to stay organized.                |
+| /showtasks       | View all your tasks in one place.                          |
+| /completedtasks  | See a list of your completed tasks.                        |
+| /incompletetasks | Check your pending tasks that need completion.             |
+| /edittask        | Modify the text of an existing task for better clarity.    |
+| /deletetask      | Remove a task from your list when it's no longer needed.   |
+| /setreminder     | Set a reminder for a task to stay on top of your schedule. |
+| /taskdetails     | Get detailed information about a specific task.            |
 
 ### How It Works
 
-![JimTaskBuddy Demo](/images/demo1.png)
+|                 Demo #1                 |                 Demo #2                 |
+|:---------------------------------------:|:---------------------------------------:|
+| ![JimTaskBuddy Demo](/images/demo1.jpg) | ![JimTaskBuddy Demo](/images/demo2.jpg) |
 
-![JimTaskBuddy Demo](/images/demo2.png)
+In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These images demonstrate how the bot works in different scenarios.
 
 ## Get Started
 
@@ -91,11 +93,13 @@ JimTaskBuddy is a Telegram bot created through the Telegram API, dedicated to im
 2. Plug in your token at the top of the `index.py` file.
 
 3. Clone this repository and install the required dependencies by running:
+
 ```sh
 pip install -r requirements.txt
 ```
 
 4. Run the bot:
+
 ```sh
 python index.py
 ```
@@ -104,4 +108,5 @@ python index.py
 
 <video src="images/dummyvideo.mp4"></video>
 
-With JimTaskBuddy as your daily task assistant, you can stay organized, focused, and productive throughout your day. Try it out and simplify your task management today!
+With JimTaskBuddy as your daily task assistant, you can stay organized, focused, and productive throughout your day. Try
+it out and simplify your task management today!
