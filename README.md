@@ -1,14 +1,16 @@
 # JimTaskBuddy - Your Daily Task Assistant
 
 <p align="center" style="border-radius: 20px;">
-  <img src="images/JimTaskBuddyLogo.jpg" alt="JimTaskBuddy Logo" width="200" height="200">
+  <img src="images/JimTaskBuddyLogo.jpg" alt="JimTaskBuddy Logo" width="150" height="150">
 </p>
 <p align="center">
 A bot designed to help you manage your daily tasks with ease.
 </p>
 
 <p align="center">
-JimTaskBuddy is a Telegram bot created through the Telegram API, dedicated to improving your task management and productivity. Powered by Natural Language Processing, the bot intelligently understands your commands and responds accordingly. From adding and tracking tasks to setting reminders, JimTaskBuddy has got you covered!
+JimTaskBuddy is a Telegram bot specifically designed to simplify and enhance your task management and productivity.
+This bot intelligently interprets your commands and provides timely and relevant responses. Whether it's adding and 
+tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to stay organized and productive.
 </p>
 
 ## At a Glance
@@ -84,13 +86,14 @@ JimTaskBuddy is a Telegram bot created through the Telegram API, dedicated to im
 |:---------------------------------------:|:---------------------------------------:|
 | ![JimTaskBuddy Demo](/images/demo1.jpg) | ![JimTaskBuddy Demo](/images/demo2.jpg) |
 
-In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These images demonstrate how the bot works in different scenarios.
+In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These
+images demonstrate how the bot works in different scenarios.
 
 ## Get Started
 
 1. Obtain your Telegram token from BotFather. More information can be found [here](https://core.telegram.org/bots).
 
-2. Plug in your token at the top of the `index.py` file.
+2. Plug in your token in the `config.py` file.
 
 3. Clone this repository and install the required dependencies by running:
 
@@ -101,7 +104,7 @@ pip install -r requirements.txt
 4. Run the bot:
 
 ```sh
-python index.py
+python run_bot.py
 ```
 
 ## Usage Video
