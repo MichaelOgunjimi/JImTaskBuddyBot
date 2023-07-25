@@ -93,7 +93,12 @@ images demonstrate how the bot works in different scenarios.
 
 1. Obtain your Telegram token from BotFather. More information can be found [here](https://core.telegram.org/bots).
 
-2. Plug in your token in the `config.py` file.
+1. Create a config.py file in your project directory. Then add the following lines:
+
+   ```python
+   from typing import Final
+   BOT_TOKEN: Final = "YourBotToken"
+   BOT_USERNAME = "YourBotName"
 
 3. Clone this repository and install the required dependencies by running:
 
