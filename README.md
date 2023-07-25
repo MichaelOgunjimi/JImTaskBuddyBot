@@ -93,7 +93,7 @@ images demonstrate how the bot works in different scenarios.
 
 1. Obtain your Telegram token from BotFather. More information can be found [here](https://core.telegram.org/bots).
 
-1. Create a config.py file in your project directory. Then add the following lines:
+2. Create a `config.py` file in your project directory. Then add the following lines:
 
    ```python
    from typing import Final
