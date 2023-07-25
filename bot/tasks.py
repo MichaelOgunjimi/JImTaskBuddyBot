@@ -1,9 +1,11 @@
-import pprint
+import time
+import datetime
+import asyncio
 import sqlite3
 from uuid import uuid4
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import Update
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, ContextTypes
 from bot.logger import log_info, log_error
 
 # from datetime import datetime
@@ -57,6 +59,41 @@ def get_task_by_id(task_id):
         return task_details
     else:
         return None
+
+
+async def check_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    while True:
+        try:
+            current_datetime = datetime.datetime.now().isoformat()
+
+            # Fetch tasks with reminders due
+            cursor.execute('SELECT id, user_id, text FROM tasks WHERE reminder_time <= ? AND reminder_status = ?',
+                           (current_datetime, True))
+            rows = cursor.fetchall()
+
+            if rows:
+                for row in rows:
+                    task_id = row[0]
+                    user_id = row[1]
+                    task_text = row[2]
+
+                    # Send notification to the user
+                    await context.bot.send_message(chat_id=user_id, text=f"Reminder: {task_text}")
+
+                    # Mark reminder as elapsed
+                    cursor.execute('UPDATE tasks SET reminder_status = ? WHERE id = ?', (False, task_id))
+                    conn.commit()
+
+            time.sleep(60)  # Check for reminders every 60 seconds
+            print("STILL CHECKING REMINDERS...")
+
+        except Exception as e:
+            log_error("An error occurred while checking reminders: {}".format(str(e)))
+
+
+# Define the function to start the reminders checking coroutine
+def start_checking_reminders():
+    asyncio.run(check_reminders(update=Update, context=CallbackContext))
 
 
 # def dummy():
@@ -349,36 +386,6 @@ async def show_tasks_command(update: Update, context):
                                        text='An error occurred while showing tasks. Please try again.')
 
 
-async def show_tasks_detail_command(update: Update, context: CallbackContext):
-    try:
-        user_id = update.effective_user.id
-
-        task_rows = get_user_tasks(user_id)
-
-        if task_rows:
-            keyboard = []
-            for task in task_rows:
-                task_id = task[0]
-                task_text = task[2]
-                task_status = "completed" if task[4] == 1 else "incomplete"
-                button_text = f"{task_text} - {task_status}"
-                keyboard.append([InlineKeyboardButton(button_text, callback_data=f"task_{task_id}")])
-
-            reply_markup = InlineKeyboardMarkup(keyboard)
-
-            await context.bot.send_message(chat_id=update.effective_chat.id, text='Your tasks are:',
-                                           reply_markup=reply_markup)
-            log_info("Tasks displayed.")
-        else:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text='No tasks found!')
-            log_info("No tasks found.")
-
-    except Exception as e:
-        log_error("An error occurred while showing tasks: {}".format(str(e)))
-        await context.bot.send_message(chat_id=update.effective_chat.id,
-                                       text='An error occurred while showing tasks. Please try again.')
-
-
 async def edit_task_command(update: Update, context: CallbackContext):
     try:
         user_id = update.effective_user.id
@@ -485,6 +492,62 @@ async def show_incomplete_tasks_command(update: Update, context: CallbackContext
         await context.bot.send_message(chat_id=update.effective_chat.id,
                                        text='An error occurred while showing incomplete tasks. Please try again.')
 
-#
-# my_tasks = get_user_tasks(1513847681)
-# pprint.pprint(my_tasks)
+
+async def show_tasks_detail_command(update: Update, context: CallbackContext):
+    try:
+        user_id = update.effective_user.id
+
+        task_rows = get_user_tasks(user_id)
+
+        if task_rows:
+            keyboard = []
+            for task in task_rows:
+                task_id = task[0]
+                task_text = task[2]
+                task_status = "completed" if task[4] == 1 else "incomplete"
+                button_text = f"{task_text} - {task_status}"
+                keyboard.append([InlineKeyboardButton(button_text, callback_data=f"task_{task_id}")])
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await context.bot.send_message(chat_id=update.effective_chat.id, text='Your tasks are:',
+                                           reply_markup=reply_markup)
+            log_info("Tasks displayed.")
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text='No tasks found!')
+            log_info("No tasks found.")
+
+    except Exception as e:
+        log_error("An error occurred while showing tasks: {}".format(str(e)))
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text='An error occurred while showing tasks. Please try again.')
+
+
+async def set_reminder_command(update: Update, context: CallbackContext):
+    try:
+        user_id = update.effective_user.id
+        task_rows = get_user_tasks(user_id)
+
+        if task_rows:
+            keyboard = []
+            for task in task_rows:
+                task_id = task[0]
+                task_text = task[2]
+                reminder_status = "Reminder set" if task[8] == 1 else "No reminder set"
+                button_text = f"{task_text} - {reminder_status}"
+                keyboard.append([InlineKeyboardButton(button_text, callback_data=f"reminder_task_{task_id}")])
+
+            reply_markup = InlineKeyboardMarkup(keyboard)
+
+            await context.bot.send_message(chat_id=update.effective_chat.id, text='Click on a task to set a reminder:',
+                                           reply_markup=reply_markup)
+            log_info("Tasks displayed waiting for reminder.")
+        else:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text='No tasks found!')
+            log_info("No tasks found.")
+
+    except Exception as e:
+        log_error("An error occurred while showing tasks: {}".format(str(e)))
+        await context.bot.send_message(chat_id=update.effective_chat.id,
+                                       text='An error occurred while showing tasks. Please try again.')
+

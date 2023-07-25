@@ -17,6 +17,7 @@ response_list = [
     [['add', 'task'], ['You can use the /addtask command to add a task.']],
     [['complete', 'task'], ['To complete a task, use the /completetask command.']],
     [['show', 'tasks'], ['To see your tasks, use the /showtasks command.']],
+    [['show', 'me', 'my', 'tasks'], ['/showtasks']],
     [['delete', 'task'], ['To delete a task, use the /deletetask command.']],
     [['edit', 'task', 'my'], ['To edit a task, use the /edittask command.']],
     [['task', 'can', 'you', 'reminder', 'set', 'reminder', 'setreminder'], ['To set a task reminder, use the /setreminder '

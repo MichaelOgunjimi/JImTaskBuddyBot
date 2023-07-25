@@ -1,11 +1,11 @@
 from telegram import Update
 from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
-from bot.tasks import add_task_command, complete_task_command, delete_task_command, show_tasks_command,  \
-    show_tasks_detail_command, \
+from bot.tasks import add_task_command, complete_task_command, delete_task_command, show_tasks_command, \
+    show_tasks_detail_command, set_reminder_command, check_reminders, \
     edit_task_command, show_completed_tasks_command, show_incomplete_tasks_command
 from bot.callback_handlers import handle_complete_query, handle_delete_query, handle_task_details_command, \
     handle_edit_task_query, \
-    handle_edit_task_input_or_messages
+    handle_edit_task_input_or_messages, handle_set_reminder_query
 from bot.logger import log_info, log_error
 
 
@@ -33,6 +33,9 @@ def register_handlers(app):
     # Add the handlers to the dispatcher
     app.add_handler(CommandHandler("edittask", edit_task_command))
     app.add_handler(CallbackQueryHandler(handle_edit_task_query, pattern=r"^edit_task_"))
+
+    app.add_handler(CommandHandler("setreminder", set_reminder_command))
+    app.add_handler(CallbackQueryHandler(handle_set_reminder_query, pattern=r"^reminder_task_"))
 
     # Register the combined MessageHandler for handling edit task input and other text messages
     app.add_handler(MessageHandler(filters.TEXT, handle_edit_task_input_or_messages))
@@ -62,7 +65,12 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "/addtask - Add a new task",
             "/completetask - Mark a task as completed",
             "/showtasks - Show all tasks",
-            "/help - Get help information"
+            "/help - Get help information",
+            "/edittask - Edit a task",
+            "/setreminder - Set a reminder for a task",
+            "/taskdetails - View the details of a task",
+            "/completedtasks - Show all completed tasks",
+            "/incompletedtasks - Show all incomplete tasks"
             # Add more commands and descriptions as needed
         ]
 
@@ -86,3 +94,5 @@ async def error(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         log_error("An error occurred while handling an error: {}".format(str(e)))
         await update.message.reply_text('An error occurred. Please try again later.')
+
+

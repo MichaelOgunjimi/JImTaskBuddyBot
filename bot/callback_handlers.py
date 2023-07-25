@@ -1,10 +1,12 @@
 from bot.tasks import cursor, conn, log_error, log_info
 from telegram import Update
-from telegram.ext import ContextTypes, CallbackContext
+from telegram.ext import ContextTypes, CallbackContext, CommandHandler
 from config import BOT_USERNAME
 from bot.response import get_response
 from bot.tasks import get_task_by_id
+from .tasks import show_tasks_command
 import re
+import datetime
 
 
 def extract_text_and_description(input_string):
@@ -32,15 +34,66 @@ def extract_text_and_description(input_string):
     return text, description
 
 
+import re
+import datetime
+
+
+def process_duration(message):
+    # Regular expression to extract numeric values and time units from the input text
+    duration_pattern = r'(\d+)\s*(seconds?|minutes?|hours?|days?|weeks?|months?|years?)'
+    matches = re.findall(duration_pattern, message)
+
+    # Create a dictionary to map time units to their corresponding values in seconds
+    time_units = {
+        'seconds': 1,
+        'minutes': 60,
+        'hours': 3600,
+        'days': 86400,
+        'weeks': 604800,
+        'months': 2629746,
+        'years': 31556952,
+        'second': 1,
+        'minute': 60,
+        'hour': 3600,
+        'day': 86400,
+        'week': 604800,
+        'month': 2629746,
+        'year': 31556952
+    }
+
+    total_seconds = 0
+    for value, unit in matches:
+        total_seconds += int(value) * time_units.get(unit.lower(), 0)
+
+    if total_seconds == 0:
+        return None, None
+
+    # Calculate the duration components (days, hours, minutes)
+    days, remainder = divmod(total_seconds, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, _ = divmod(remainder, 60)
+
+    # Return the timedelta object and formatted datetime for the database
+    duration_timedelta = datetime.timedelta(days=days, hours=hours, minutes=minutes)
+    future_datetime = datetime.datetime.now() + duration_timedelta
+    future_date_str = future_datetime.isoformat()
+
+    return duration_timedelta, future_date_str
+
+
 async def handle_edit_task_input_or_messages(update: Update, context: CallbackContext):
     try:
         if 'edit_task_id' in context.user_data:
             print("User editing task input in progress")
             # Editing task input is in progress, handle it
             await handle_edit_task_input(update, context)
+        elif 'set_reminder_task_id' in context.user_data:
+            print("User setting riminder to task in progress")
+            # Setting task input is in progress, handle it
+            await handle_set_reminder_input(update, context)
         else:
             print("User normal input in progress")
-            # No editing task input in progress, handle other text messages
+            # No editing or setting task input in progress, handle other text messages
             bot_response = await handle_messages(update, context)
             user_id = update.message.chat.id
             log_info(f"User ({user_id}) - Bot Response: {bot_response}")
@@ -69,8 +122,10 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         log_info(f"Bot: {response}")
         await update.message.reply_text(response)
-
-        return response  # Return the bot response for use in handle_edit_task_input_or_messages
+        # if response == '/showtasks':
+        #     await context.dispatcher.process_update(update.effective_user, '/showtasks')
+        #
+        # return response  # Return the bot response for use in handle_edit_task_input_or_messages
 
     except Exception as e:
         log_error(f"An error occurred while handling messages: {str(e)}")
@@ -139,7 +194,6 @@ async def handle_edit_task_query(update: Update, context: CallbackContext):
 # Message handler for editing task text or description
 async def handle_edit_task_input(update: Update, context: CallbackContext):
     try:
-        print(context.user_data)
         if 'edit_task_id' in context.user_data:
             input_text = update.message.text
             task_id = context.user_data['edit_task_id']
@@ -191,6 +245,63 @@ async def handle_edit_task_input(update: Update, context: CallbackContext):
         await update.message.reply_text('An error occurred while handling the edit task input. Please try again.')
 
 
+async def handle_set_reminder_query(update: Update, context: CallbackContext):
+    query = update.callback_query
+    try:
+        task_id = query.data.replace("reminder_task_", "")
+
+        # Ask the user for the reminder time using a message
+        context.user_data['set_reminder_task_id'] = task_id
+        await query.message.reply_text("Please enter the reminder time using natural language (e.g., 'set reminder "
+                                       "for the 5 hours' or just '5 hours' or 2 hours, or , 30 minutes, or 4 days):")
+
+        # Set the next step to handle the reminder time input
+        return "handle_set_reminder_input"
+
+    except Exception as e:
+        log_error("An error occurred while handling the set_reminder query: {}".format(str(e)))
+        await query.message.reply_text('An error occurred while handling the set_reminder query. Please try again.')
+
+
+async def handle_set_reminder_input(update: Update, context: CallbackContext):
+    try:
+
+        time_input = update.message.text
+        if 'set_reminder_task_id' in context.user_data:
+            task_to_remind_id = context.user_data['set_reminder_task_id']
+            user_id = update.effective_user.id
+
+            # Process the time_input to set the reminder for the task with task_id
+            duration_timedelta, future_date_str = process_duration(time_input)
+            if future_date_str:
+                # Add the reminder time and status to the database
+                cursor.execute('UPDATE tasks SET reminder_time = ?, reminder_status = ? WHERE id = ? AND user_id = ?',
+                               (future_date_str, True, task_to_remind_id, user_id))
+                conn.commit()
+
+                await update.message.reply_text('Reminder set successfully!')
+                log_info("Reminder set successfully.")
+
+                # Clear the user_data to mark the end of the reminder time input
+                context.user_data.pop('set_reminder_task_id')
+            else:
+                await update.message.reply_text(
+                    'Invalid command format. Please provide a valid duration for the reminder (e.g., 3 days, 2 hours, 30 minutes).'
+                )
+                log_info("Invalid command format for setting reminder.")
+
+        else:
+            await update.message.reply_text('Invalid command. Please use the /setreminder command first.')
+            log_info("Invalid command for setting reminder.")
+
+    except Exception as e:
+        log_error("An error occurred while handling the set_reminder input: {}".format(str(e)))
+        await update.message.reply_text(
+            'An error occurred while handling the set_reminder input. Please try again.')
+        # Clear the user_data to mark the end of the reminder time input
+        context.user_data.pop('set_reminder_task_id')
+
+
 async def handle_task_details_command(update: Update, context: CallbackContext):
     query = update.callback_query
     try:
@@ -210,3 +321,11 @@ async def handle_task_details_command(update: Update, context: CallbackContext):
     except Exception as e:
         log_error("An error occurred while handling the task details: {}".format(str(e)))
         await query.message.reply_text('An error occurred while handling the task details. Please try again.')
+
+#
+# # Test the function with user input
+# user_input = "Set a reminder for 2 weeks, 3 days, 1 hour, and 45 minutes"
+# duration_timedelta, future_date_str = process_duration(user_input)
+#
+# print("Duration Timedelta:", duration_timedelta)
+# print("Formatted Future Date for Database:", future_date_str)
