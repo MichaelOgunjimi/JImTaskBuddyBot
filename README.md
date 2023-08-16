@@ -87,7 +87,10 @@ tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to 
 
 ## Usage Video
 
-![JimTaskBuddy](https://github.com/MichaelOgunjimi/JImTaskBuddyBot/assets/115373619/8683f788-539d-43de-b983-80bc31e59087)
+
+
+https://github.com/MichaelOgunjimi/JImTaskBuddyBot/assets/115373619/91c17c04-1589-4237-9955-ee493b09eb72
+
 
 
 In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These
