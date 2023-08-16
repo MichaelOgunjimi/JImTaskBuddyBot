@@ -15,7 +15,10 @@ tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to 
 
 ## At a Glance
 
-![JimTaskBuddy](https://private-user-images.githubusercontent.com/115373619/260879909-842e8096-6788-4b7b-a102-64382f02db8d.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTEiLCJleHAiOjE2OTIxNTEyMjYsIm5iZiI6MTY5MjE1MDkyNiwicGF0aCI6Ii8xMTUzNzM2MTkvMjYwODc5OTA5LTg0MmU4MDk2LTY3ODgtNGI3Yi1hMTAyLTY0MzgyZjAyZGI4ZC5tcDQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBSVdOSllBWDRDU1ZFSDUzQSUyRjIwMjMwODE2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDIzMDgxNlQwMTU1MjZaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1jMTA3MWQ2MjRjMDU2MWQ1ZjE0YjUyZjRlNzM2MTkwNGY2YzcyZDAyMDU2NDVjN2ViMzNiNzZjYTdhZGY5NDJmJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.KVOReuhL2BB-zh3Ny9v4J1uphdfhDgqGqSpldxE6eAw)
+|                 Demo #1                 |                 Demo #2                 |
+|:---------------------------------------:|:---------------------------------------:|
+| ![JimTaskBuddy Demo](/images/demo1.jpg) | ![JimTaskBuddy Demo](/images/demo2.jpg) |
+
 
 ## Features
 
@@ -82,9 +85,10 @@ tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to 
 
 ### How It Works
 
-|                 Demo #1                 |                 Demo #2                 |
-|:---------------------------------------:|:---------------------------------------:|
-| ![JimTaskBuddy Demo](/images/demo1.jpg) | ![JimTaskBuddy Demo](/images/demo2.jpg) |
+## Usage Video
+
+![JimTaskBuddy](https://github.com/MichaelOgunjimi/JImTaskBuddyBot/assets/115373619/8683f788-539d-43de-b983-80bc31e59087)
+
 
 In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These
 images demonstrate how the bot works in different scenarios.
@@ -111,10 +115,6 @@ pip install -r requirements.txt
 ```sh
 python run_bot.py
 ```
-
-## Usage Video
-
-![JimTaskBuddy](/images/dummyvideo.mp4)
 
 With JimTaskBuddy as your daily task assistant, you can stay organized, focused, and productive throughout your day. Try
 it out and simplify your task management today!
