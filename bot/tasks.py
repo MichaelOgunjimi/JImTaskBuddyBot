@@ -1,12 +1,13 @@
 import time
 import datetime
-import asyncio
 import sqlite3
 from uuid import uuid4
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram import Update
 from telegram.ext import CallbackContext, ContextTypes
 from bot.logger import log_info, log_error
+import threading
+import asyncio
 
 # from datetime import datetime
 
@@ -61,15 +62,18 @@ def get_task_by_id(task_id):
         return None
 
 
-async def check_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
+# Define the asynchronous function to check reminders
+async def check_reminders_async(context: CallbackContext):
     while True:
         try:
             current_datetime = datetime.datetime.now().isoformat()
 
-            # Fetch tasks with reminders due
-            cursor.execute('SELECT id, user_id, text FROM tasks WHERE reminder_time <= ? AND reminder_status = ?',
-                           (current_datetime, True))
-            rows = cursor.fetchall()
+            db_conn = sqlite3.connect('C:/Users/michaelO/Desktop/Projects/JimTaskBuddy/data/tasks.db')
+            cursor2 = db_conn.cursor()
+
+            cursor2.execute('SELECT id, user_id, text FROM tasks WHERE reminder_time <= ? AND reminder_status = ?',
+                            (current_datetime, True))
+            rows = cursor2.fetchall()
 
             if rows:
                 for row in rows:
@@ -78,22 +82,25 @@ async def check_reminders(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     task_text = row[2]
 
                     # Send notification to the user
-                    await context.bot.send_message(chat_id=user_id, text=f"Reminder: {task_text}")
+                    # You might need to obtain the bot instance here
+                    await context.bot.send_message(chat_id=user_id, text=f"Reminder for task: {task_text} is due.")
+                    print(f"Reminder for task: **{task_text.upper()}** is sent to user: {user_id}")
 
                     # Mark reminder as elapsed
-                    cursor.execute('UPDATE tasks SET reminder_status = ? WHERE id = ?', (False, task_id))
-                    conn.commit()
+                    cursor2.execute('UPDATE tasks SET reminder_status = ? WHERE id = ?', (False, task_id))
+                    db_conn.commit()
 
-            time.sleep(60)  # Check for reminders every 60 seconds
+            db_conn.close()
+            time.sleep(30)  # Check for reminders every 30 seconds
             print("STILL CHECKING REMINDERS...")
 
         except Exception as e:
-            log_error("An error occurred while checking reminders: {}".format(str(e)))
+            log_error("An error occurred while checking reminders:", e)
 
 
-# Define the function to start the reminders checking coroutine
-def start_checking_reminders():
-    asyncio.run(check_reminders(update=Update, context=CallbackContext))
+# Synchronous wrapper function for starting the asynchronous function
+def check_reminders_sync(context: CallbackContext):
+    asyncio.run(check_reminders_async(context))
 
 
 # def dummy():
@@ -435,7 +442,13 @@ async def show_completed_tasks_command(update: Update, context: CallbackContext)
                 if task_status == 1:  # Completed task
                     completed_tasks.append(f"{task_text} - completed")
 
+            if len(completed_tasks) == 0:
+                await context.bot.send_message(chat_id=update.effective_chat.id, text='No completed tasks found!')
+                log_info("No completed tasks found.")
+                return
+
             completed_keyboard = []
+
             for completed_task in completed_tasks:
                 button = InlineKeyboardButton(completed_task, callback_data="dummy_value")
                 completed_keyboard.append([button])
@@ -550,4 +563,3 @@ async def set_reminder_command(update: Update, context: CallbackContext):
         log_error("An error occurred while showing tasks: {}".format(str(e)))
         await context.bot.send_message(chat_id=update.effective_chat.id,
                                        text='An error occurred while showing tasks. Please try again.')
-

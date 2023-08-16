@@ -1,7 +1,7 @@
 from telegram import Update
 from telegram.ext import CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 from bot.tasks import add_task_command, complete_task_command, delete_task_command, show_tasks_command, \
-    show_tasks_detail_command, set_reminder_command, check_reminders, \
+    show_tasks_detail_command, set_reminder_command, \
     edit_task_command, show_completed_tasks_command, show_incomplete_tasks_command
 from bot.callback_handlers import handle_complete_query, handle_delete_query, handle_task_details_command, \
     handle_edit_task_query, \

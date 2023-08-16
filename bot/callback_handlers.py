@@ -78,6 +78,7 @@ def process_duration(message):
     future_datetime = datetime.datetime.now() + duration_timedelta
     future_date_str = future_datetime.isoformat()
 
+    print(duration_timedelta, future_date_str)
     return duration_timedelta, future_date_str
 
 
@@ -88,7 +89,7 @@ async def handle_edit_task_input_or_messages(update: Update, context: CallbackCo
             # Editing task input is in progress, handle it
             await handle_edit_task_input(update, context)
         elif 'set_reminder_task_id' in context.user_data:
-            print("User setting riminder to task in progress")
+            print("User setting reminder to task in progress")
             # Setting task input is in progress, handle it
             await handle_set_reminder_input(update, context)
         else:

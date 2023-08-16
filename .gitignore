@@ -1,3 +1,4 @@
 config.py
 venv
 bot/logs/bot.log
+testing.py
