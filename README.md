@@ -86,11 +86,7 @@ tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to 
 ### How It Works
 
 # Usage Video
-
-
 https://github.com/MichaelOgunjimi/JImTaskBuddyBot/assets/115373619/4da052a1-4d2b-4fbd-b811-0296ede60985
-
-
 
 In the "How It Works" section, we have provided two demo images to showcase the functionality of JimTaskBuddy. These
 images demonstrate how the bot works in different scenarios.
