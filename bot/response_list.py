@@ -1,6 +1,8 @@
 # Add your custom responses here
 response_list = [
-    [['hello', 'hi', 'hey', 'what\'s', 'sup', 'hiya', 'yo'], ['Hey there!']],
+    [['who', 'created', 'you'], ["Michael Ogunjimi created this bot, you can contact here on linkedIn "
+                                 ":www.linkedin.com/in/michaelogunjimi"]],
+    [['hello', 'hi', 'hey', 'heyyyy', 'heyy', 'what\'s', 'sup', 'hiya', 'yo'], ['Hey there!']],
     [['what\'s', 'up', 'hi', 'hey', 'what\'s', 'sup', 'hiya', 'yo'], ['I\'m doing fine, thanks!']],
     [['how', 'are', 'you'], ['I\'m doing great!']],
     [['your', 'name'], ['My name is MyTaskBuddy, nice to meet you!']],
@@ -20,8 +22,9 @@ response_list = [
     [['show', 'me', 'my', 'tasks'], ['/showtasks']],
     [['delete', 'task'], ['To delete a task, use the /deletetask command.']],
     [['edit', 'task', 'my'], ['To edit a task, use the /edittask command.']],
-    [['task', 'can', 'you', 'reminder', 'set', 'reminder', 'setreminder'], ['To set a task reminder, use the /setreminder '
-                                                               'command.']],
+    [['task', 'can', 'you', 'reminder', 'set', 'reminder', 'setreminder'],
+     ['To set a task reminder, use the /setreminder '
+      'command.']],
     [['task', 'details'], ['To get details about a task, use the /taskdetails command.']],
     [['completed', 'tasks'], ['To view completed tasks, use the /completedtasks command.']],
     [['incomplete', 'tasks'], ['To view completed tasks, use the /incompletedtasks command.']],
