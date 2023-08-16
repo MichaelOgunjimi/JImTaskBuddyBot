@@ -15,7 +15,7 @@ tracking tasks or setting reminders, JimTaskBuddy has all the tools you need to 
 
 ## At a Glance
 
-![JimTaskBuddy]([/images/jimtaskbuddy.png](https://github.com/MichaelOgunjimi/JimTaskBuddyBot/assets/115373619/842e8096-6788-4b7b-a102-64382f02db8d))
+![JimTaskBuddy]([/images/jimtaskbuddy.png](https://github.com/MichaelOgunjimi/JimTaskBuddyBot/images/115373619/842e8096-6788-4b7b-a102-64382f02db8d))
 
 ## Features
 
