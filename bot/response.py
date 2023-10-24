@@ -17,6 +17,7 @@ def process_message(message, response_array, response):
 
 
 def get_response(message):
+    print('User message:', message)
     # Add your custom responses here
     processed_response_list = [
 

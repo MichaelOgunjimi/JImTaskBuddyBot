@@ -42,10 +42,12 @@ def process_duration(message):
     # Regular expression to extract numeric values and time units from the input text
     duration_pattern = r'(\d+)\s*(seconds?|minutes?|hours?|days?|weeks?|months?|years?)'
     matches = re.findall(duration_pattern, message)
+    print(matches)
 
     # Create a dictionary to map time units to their corresponding values in seconds
     time_units = {
         'seconds': 1,
+        'second': 1,
         'minutes': 60,
         'hours': 3600,
         'days': 86400,
@@ -323,7 +325,6 @@ async def handle_task_details_command(update: Update, context: CallbackContext):
         log_error("An error occurred while handling the task details: {}".format(str(e)))
         await query.message.reply_text('An error occurred while handling the task details. Please try again.')
 
-#
 # # Test the function with user input
 # user_input = "Set a reminder for 2 weeks, 3 days, 1 hour, and 45 minutes"
 # duration_timedelta, future_date_str = process_duration(user_input)

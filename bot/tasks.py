@@ -8,10 +8,18 @@ from telegram.ext import CallbackContext, ContextTypes
 from bot.logger import log_info, log_error
 import threading
 import asyncio
+import os
 
-# from datetime import datetime
+# Specify the file path
+db_file_path = r'C:\Users\michaelO\Desktop\GitHub Projects\JimTaskBuddy\data\tasks.db'
 
-conn = sqlite3.connect('C:/Users/michaelO/Desktop/Projects/JimTaskBuddy/data/tasks.db')
+
+# Check if the database file exists, if not, create it
+if not os.path.exists(db_file_path):
+    open(db_file_path, 'w').close()
+
+# Connect to the database
+conn = sqlite3.connect(db_file_path)
 cursor = conn.cursor()
 
 # Create the tasks table if it doesn't exist
@@ -68,7 +76,15 @@ async def check_reminders_async(context: CallbackContext):
         try:
             current_datetime = datetime.datetime.now().isoformat()
 
-            db_conn = sqlite3.connect('C:/Users/michaelO/Desktop/Projects/JimTaskBuddy/data/tasks.db')
+            # Specify the file path
+            db_path = r'C:\Users\michaelO\Desktop\GitHub Projects\JimTaskBuddy\data\tasks.db'
+
+            # Check if the database file exists, if not, create it
+            if not os.path.exists(db_path):
+                open(db_path, 'w').close()
+
+            # Connect to the database
+            db_conn = sqlite3.connect(db_path)
             cursor2 = db_conn.cursor()
 
             cursor2.execute('SELECT id, user_id, text FROM tasks WHERE reminder_time <= ? AND reminder_status = ?',
@@ -92,14 +108,22 @@ async def check_reminders_async(context: CallbackContext):
 
             db_conn.close()
             time.sleep(30)  # Check for reminders every 30 seconds
-            print("STILL CHECKING REMINDERS...")
+            # print("STILL CHECKING REMINDERS...")
 
         except Exception as e:
-            log_error("An error occurred while checking reminders:", e)
+            log_error(e)
 
 
 # Synchronous wrapper function for starting the asynchronous function
 def check_reminders_sync(context: CallbackContext):
+    """
+        Asynchronously checks for reminders in the tasks database and sends notifications to users if a reminder is due.
+        @:param:
+            context (CallbackContext): The context object that contains information about the current state of the program.
+        Returns:
+            None
+    """
+
     asyncio.run(check_reminders_async(context))
 
 
